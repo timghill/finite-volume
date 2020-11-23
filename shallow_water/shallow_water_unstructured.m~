@@ -6,7 +6,7 @@
 %  2: Circular domain with initial circular dam
 %  3: Wave propagating through domain with constriction in the middle
 
-casenum=2;
+casenum=1;
 
 %% Setup
 % Time-stepping
@@ -73,36 +73,39 @@ my=yout(:,2*N+1:end)';
 for ii=1:length(tspan)
     t=tspan(ii);
     figure(1)
-    h_node=interp_el_node(dmesh,h(:,ii));
-    trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),h_node)
+%     h_node=interp_el_node(dmesh,h(:,ii));
+%     trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),h_node)
+    hold on
+    patch('Faces', dmesh.tri.connect, 'Vertices', dmesh.tri.nodes,...
+        'FaceVertexCData', h(:,ii), 'FaceColor', 'flat');
 
-    axis([-1,1,-1,1,0.5,2.5])
-    caxis([0.5, 2.5])
+%     axis([-1,1,-1,1,0.5,2.5])\
     colormap('winter')
-%     colormap(palettes('blue-4'))
     title(sprintf('t = %.3f', t))
     caxis([0.5,2.5])
     drawnow
     pause(0.1)
 end
-
-kk=[4,18,28];
-for ii=kk
-        t=tspan(ii);
-    figure(1)
-    h_node=interp_el_node(dmesh,h(:,ii));
-    trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),h_node)
-
-    axis([-1,1,-1,1,0.5,2.5])
-    caxis([0.5, 2.5])
-    colormap('winter')
+% 
+% kk=[4,18,28];
+% for ii=kk
+%     t=tspan(ii);
+%     figure
+% %     h_node=interp_el_node(dmesh,h(:,ii));
+%     
+% %     trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),h_node,'EdgeColor','none');%,'FaceColor','interp')
+% 
+%     patch('Faces', dmesh.tri.connect, 'Vertices', dmesh.tri.nodes,...
+%         'FaceVertexCData', h_node, 'FaceColor', 'interp');
+% 
+%     axis([-1,1,-1,1,0.75,2])
 %     colormap(palettes('blue-4'))
-    title(sprintf('t = %.3f', t))
-    caxis([0.5,2.5])
-    drawnow
-    print(sprintf('sw_solution_%i',ii),'-dpng','-r600')
-    pause(1)
-end
+%     title(sprintf('t = %.3f', t))
+%     caxis([0.75,2])
+%     drawnow
+%     print(sprintf('sw_solution_%i',ii),'-dpng','-r600')
+% %     pause(0.1)
+% end
 
 %% Analysis - Compute total energy and mass
 M=sum(h.*dmesh.tri.area,1)'./M0;

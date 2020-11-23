@@ -24,7 +24,7 @@ params.gamma=1e-1;
 % Note that 'neumann' boundary conditions conserve thermal energy, while
 % the other BCs allow heat to flow out of the domain through the boundary
 
-params.bc='dirichlet';
+params.bc='neumann';
 params.v_dirichlet=0;   % Must specify value for Dirichlet condition
 
 %% Initial conditions
@@ -79,6 +79,8 @@ for ii=kk
     print(sprintf('heat_%s_%i',params.bc,ii),'-dpng','-r600')
 end
 
+% Compute total "Mass" in the domain. Depending on the boundary conditions
+% this may be conserved.
 M=sum(u.*dmesh.tri.area,1)/M0;
 figure
 plot(tt,M)

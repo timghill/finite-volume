@@ -1,2 +1,2 @@
 # Finite volume methods for conservation laws
-Some stuff goes here.
+This documentation describes the implementation of first-order finite volume methods on unstructured triangular meshes to solve the shallow water, heat, and nonlinear heat equations.

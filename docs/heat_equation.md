@@ -29,7 +29,7 @@ This method is simple to implement, but it has been shown to be *inconsistent* o
 
 The code below calculates the gradient using the green-gauss method:
 
-```matlab
+```Matlab
 vx=zeros(size(v));      % x-component of gradient of v, defined on elements
 vy=zeros(size(v));      % y-component of gradient of v, defined on elements
 
@@ -84,7 +84,7 @@ for \\(\vec{x}\\) in the least-squares sense.
 
 
 The code below calculates the gradient using the green-gauss hybrid method:
-```matlab
+```Matlab
 vx=zeros(size(v));      % x-component of gradient of v, defined on elements
 vy=zeros(size(v));      % y-component of gradient of v, defined on elements
 

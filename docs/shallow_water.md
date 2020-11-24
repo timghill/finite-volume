@@ -43,6 +43,6 @@ where \\(\alpha = \frac{|m_n|}{h} + \sqrt{h}\\) (which can be calculated from th
 ## Boundary conditions
 We apply ideal wall boundary conditions. That is, we implement ghost cells where we reverse the momentum components
 
-$$ \vec{u}_j = \begin{bmatrix} h_i \\\ -m_{n, i} \\\ -m_{\tau, i} \end{bmatrix}$$
+$$\vec{u}_j = \begin{bmatrix} h \\\ -m \\\ -m \end{bmatrix}$$
 
 This ensures no mass crosses the boundary.

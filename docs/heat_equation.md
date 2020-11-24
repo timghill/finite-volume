@@ -23,9 +23,46 @@ The Green-Gauss method uses the Green-Gauss/divergence theorem to calculate the 
 
 $$\nabla u = \frac{1}{|\Omega|} \sum_{k=1}^N u_k \vec{n}_k$$,
 where the edge value \\(\vec{u}_k\\) is calculated as the average of the neighbouring elements,
-$$\vec{u}_k = \frac{1}{2}(\vec{u}_1 + \vec{u}_2)$$.
+$$\vec{u}_k = \frac{1}{2}(\vec{u}_1 + \vec{u}_2)$$
 
 This method is simple to implement, but it has been shown to be *inconsistent* on unstructured meshes. That is, the gradient calculation converges to an incorrect value as the mesh is refined.
+
+The code below calculates the gradient using the green-gauss method:
+
+```matlab
+vx=zeros(size(v));      % x-component of gradient of v, defined on elements
+vy=zeros(size(v));      % y-component of gradient of v, defined on elements
+
+% First compute the gradient of v by integrating over triangle edges (e.g.
+% by applying divergence theorem)
+for ii=1:dmesh.tri.n_elements
+    for kk=1:3
+        nvec=[dmesh.tri.nx(ii,kk),dmesh.tri.ny(ii,kk)];
+        r=dmesh.tri.ds(ii,kk)/dmesh.tri.area(ii);
+        iEdge=dmesh.tri.connect_el_edge(ii,kk);
+
+        v1 = v(ii);
+        adj_i = dmesh.tri.connect_el_el(ii,kk);
+
+        if adj_i>0
+            v2 = v(adj_i);
+
+        else        % Apply boundary conditions
+            if strcmp(params.bc,'dirichlet')
+                v2=params.v_dirichlet;
+            elseif strcmp(params.bc,'neumann')
+                v2=v1;
+            elseif strcmp(params.bc,'flux')
+                v2=v1;
+            end
+        end
+
+        v_bndry=0.5*(v1+v2);
+        vx(ii) = vx(ii) + r*v_bndry*nvec(1);
+        vy(ii) = vy(ii) + r*v_bndry*nvec(2);
+    end
+end
+```
 
 ## Green-Gauss hybrid method
 We can fix the issues with the Green-Gauss method by being smarter in calculating the edge value \\(u_k\\). Let \\(\{\Gamma_i\}\\}_{i=1}^m\\) be the set of elements that share a node with edge \\(\Gamma_k\\). Then, for an arbitrary element, we can expand
@@ -34,7 +71,7 @@ $$u_i = u_k + \frac{\partial u_k}{\partial x}\Delta x + \frac{\partial u_k}{\par
 
 Combining the \\(m\\) equations, we find a matrix system
 
-$$\begin{bmatrix} 1 && \Delta x_1 && \Delta y_1 \\\ 1 && \Delta x_2 && \Delta y_2 \\\ && \vdots && \\\ 1 && \Delta x_m && \Delta y_m \end{bmatrix} \begin{bmatrix} u_k \\\ \frac{\partial u_k}{\partial x} \\\ \frac{\partial u_k}{\partial y} \end{bmatrix} = \begin{bmatrix} u_1 \\\ u_2 \\\ \vdots \\\ u_m \end{bmatrix}$$.
+$$\begin{bmatrix} 1 && \Delta x_1 && \Delta y_1 \\\ 1 && \Delta x_2 && \Delta y_2 \\\ && \vdots && \\\ 1 && \Delta x_m && \Delta y_m \end{bmatrix} \begin{bmatrix} u_k \\\ \frac{\partial u_k}{\partial x} \\\ \frac{\partial u_k}{\partial y} \end{bmatrix} = \begin{bmatrix} u_1 \\\ u_2 \\\ \vdots \\\ u_m \end{bmatrix}$$
 
 We write this as
 $$ A\vec{x} = \vec{b}$$.
@@ -45,9 +82,43 @@ $$ W A \vec{x} = W \vec{b}$$
 
 for \\(\vec{x}\\) in the least-squares sense.
 
+
+The code below calculates the gradient using the green-gauss hybrid method:
+```matlab
+vx=zeros(size(v));      % x-component of gradient of v, defined on elements
+vy=zeros(size(v));      % y-component of gradient of v, defined on elements
+
+% First compute the gradient of v by integrating over triangle edges (e.g.
+% by applying divergence theorem)
+for ii=1:dmesh.tri.n_elements
+    for kk=1:3
+        nvec=[dmesh.tri.nx(ii,kk),dmesh.tri.ny(ii,kk)];
+        r=dmesh.tri.ds(ii,kk)/dmesh.tri.area(ii);
+        iEdge=dmesh.tri.connect_el_edge(ii,kk);
+
+        neigh_els=dmesh.tri.edge_stencil{iEdge};
+
+        edgex=dmesh.tri.edge_midpoints(iEdge,1);
+        edgey=dmesh.tri.edge_midpoints(iEdge,2);
+
+        dx=dmesh.tri.elements(neigh_els,1)-edgex;
+        dy=dmesh.tri.elements(neigh_els,2)-edgey;
+
+        A = [ones(size(dx)), dx, dy];
+        b = v(neigh_els);
+        W=diag(1./sqrt(dx.^2 + dy.^2));
+        W=W/sum(W(:));
+        x_lsq = (W*A)\(W*b);
+        v_bndry = x_lsq(1);
+        vx(ii) = vx(ii) + r*v_bndry*nvec(1);
+        vy(ii) = vy(ii) + r*v_bndry*nvec(2);
+    end
+end
+```
+
 ## Nonlinear heat equation
 We can also consider a more general flux of the form
 
 $$ \vec{q} = -\gamma u^\alpha \left| \nabla u \right|^{\beta - 1} \nabla u.$$
 
-This allows us to simulate the heat equation (\\(\alpha = 0, \beta = 1)\\), a nonlinear heat equation \\((\alpha = \beta = 1\\), or a turbulent flow parameterization \\(\alpha = 3/2, \beta = 1/2\\).
+This allows us to simulate the heat equation (\\(\alpha = 0, \beta = 1)\\), a nonlinear heat equation \\((\alpha = \beta = 1)\\), or a turbulent flow parameterization \\(\alpha = 3/2, \beta = 1/2\\).

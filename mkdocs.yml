@@ -6,3 +6,7 @@ theme:
 extra_javascript:
         - 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML'
         - 'javascripts/extra.js'
+pages:
+        - Home: index.md
+        - shallow_water.md
+        - heat_equation.md

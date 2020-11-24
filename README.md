@@ -16,3 +16,19 @@ $$ \\iint_\Omega \frac{\partial u}{\partial t} dA + \\iint_\Omega\nabla \cdot \v
 Apply the divergence theorem to the second term, and pull the time derivative out of the first integral:
 
 $$ \frac{\partial}{\partial t} \\iint_\Omega u dA + \int\_{\partial\Omega}\vec{q}(u, \nabla u)\cdot\vec{n}dl = \\iint_\Omega f dA$$
+
+Now, let \\(\bar{u}\\) be the average value of \\(u\\) over \\(\Omega\\), \\(F\\) be the average of \\(f\\), and \\(|\Omega|\\) be the area. Then we have
+
+$$ |\Omega|\frac{\partial \bar{u}}{\partial t} + \int\_{\partial\Omega}\vec{q}(u, \nabla u)\cdot\vec{n}dl = |\Omega| F$$
+
+This yields an important equation for the average value of \\(u\\),
+
+$$ \frac{\partial \bar{u}}{\partial t} + \frac{1}{|\Omega|}\int\_{\partial\Omega}\vec{q}(u, \nabla u)\cdot\vec{n}dl = F$$
+
+This equation says that the average value of \\(u\\) only changes due to the net flux flowing in through the boundary (first term) or the source term \\(F\\). This result should not be surprising or new, but it is an important step along the way to the semi-discrete form.
+
+Suppose that \\(\Omega\\) is a polygon with \\(N\\) edges (extend to 3D by considering a polyhedron with \\(N\\) faces). Then we can break up the contour integral to be the sum of contributions from each edge. On each edge, we replace the line integral by the average value \\(\vec{q}_k\\) multiplied by the edge length \\(l_k\\). Therefore, we have
+
+$$ \frac{\partial \bar{u}}{\partial t} + \frac{1}{|\Omega|} \sum_{k=1}^N \vec{q}_k \cdot \vec{n}_k l_k = F$$
+
+This is the semi-discrete form, since the spatial component has been discretized but the temporal component has not. Note that the method is not yet complete since we have not specified how to calculate the edge values \\(\vec{q}_k\\).

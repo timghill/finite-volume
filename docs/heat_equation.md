@@ -28,10 +28,19 @@ $$\vec{u}_k = \frac{1}{2}(\vec{u}_1 + \vec{u}_2)$$.
 This method is simple to implement, but it has been shown to be *inconsistent* on unstructured meshes. That is, the gradient calculation converges to an incorrect value as the mesh is refined.
 
 ## Green-Gauss hybrid method
-We can fix the issues with the Green-Gauss method by being smarter in calculating the edge value \\(u_k\\). Let \\(\{\Gamma_i\\}_{i=1}^m\\) be the set of elements that share a node with edge \\(\Gamma_k\\). Then, for an arbitrary element, we can expand
+We can fix the issues with the Green-Gauss method by being smarter in calculating the edge value \\(u_k\\). Let \\(\{\Gamma_i\}\\}_{i=1}^m\\) be the set of elements that share a node with edge \\(\Gamma_k\\). Then, for an arbitrary element, we can expand
 
 $$u_i = u_k + \frac{\partial u_k}{\partial x}\Delta x + \frac{\partial u_k}{\partial y}\Delta y.$$
 
 Combining the \\(m\\) equations, we find a matrix system
 
-$$\begin{bmatrix} 1 && \Delta x_1 && \Delta y_1 \\\ 1 && \Delta x_2 && \Delta y_2 \\\ && \vdots && \\\ 1 && \Delta x_m && \Delta y_m \end{bmatrix} \begin{bmatrix} u_k \\\ \frac{\partial u_k}{\partial x} \\\ \frac{\partial u_k}{\partial y} \end{bmatrix} = \begin{bmatrix} u_1 \\\ u_2 \\\ vdots \\\ u_m \end{bmatrix}$$
+$$\begin{bmatrix} 1 && \Delta x_1 && \Delta y_1 \\\ 1 && \Delta x_2 && \Delta y_2 \\\ && \vdots && \\\ 1 && \Delta x_m && \Delta y_m \end{bmatrix} \begin{bmatrix} u_k \\\ \frac{\partial u_k}{\partial x} \\\ \frac{\partial u_k}{\partial y} \end{bmatrix} = \begin{bmatrix} u_1 \\\ u_2 \\\ \vdots \\\ u_m \end{bmatrix}$$.
+
+We write this as
+$$ A\vec{x} = \vec{b}$$.
+
+The last step is to assign weights to each of these equations. For each element we define a weight \\(w_k = (\Delta x_k^2 + \Delta y_k^2)^{-1/2}\\), which definethe diagonal weight matrix \\(W\\), with \\((W_kk) = w_k \\). Therefore, we solve the system
+
+$$ W A \vec{x} = W \vec{b}$$
+
+for \\(\vec{x}\\) in the least-squares sense.

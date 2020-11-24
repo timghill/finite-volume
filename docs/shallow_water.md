@@ -9,10 +9,12 @@ $$\frac{\partial}{\partial t} \begin{bmatrix} h \\\ m\_x \\\ m\_y \end{bmatrix} 
 
 We also note the symmetry between \\(x\\) and \\(y\\). We recognize the \\(\frac{\partial}{\partial x}\\) term as representing the flux in the \\(x\\)-direction, and the \\(\frac{\partial}{\partial y}\\) term as representing the flux in the \\(y\\)-direction (for example by integrating over a square). To apply finite volume methods, we therefore need to write the flux generally for normal and tangent momentum components.
 
-Let \\(m_n\\) by the normal component of momentum, and \\(m_t\\) be the tangent component with respect to a a cell boundary. Then, we have that the flux is
+Let \\(m_n\\) by the normal component of momentum, and \\(m_\tau\\) be the tangent component with respect to a a cell boundary. Then, we have that the flux is
 
-$$ \vec{f}(\vec{u}) = \begin{bmatrix} f_h \\\ f_n \\\ f_\Tau \end{bmatrix} = \begin{bmatrix} m_n \\\ \frac{m_x^n}{h} + \frac{1}{2}gh^2 \\\ \frac{m_n m_t}{h} \end{bmatrix}$$
+$$ \vec{f}(\vec{u}) = \begin{bmatrix} f_h \\\ f_n \\\ f_\tau \end{bmatrix} = \begin{bmatrix} m_n \\\ \frac{m_x^n}{h} + \frac{1}{2}gh^2 \\\ \frac{m_n m_\tau}{h} \end{bmatrix}$$
 
 Note that the first component says that convergence of the normal component of momentum causes an increase in water depth. This is exactly what we want! Now, we can write the system of equations as
 
-$$\frac{\partial \vec{u}}{\partial t} + \frac{\partial}{\partial n} \vec{f}(\vec{u}) + \frac{\partial}{\partial \Tau} \vec{f}(\vec{u}) = 0$$.
+$$\frac{\partial \vec{u}}{\partial t} + \frac{\partial}{\partial n} \vec{f}(\vec{u}) + \frac{\partial}{\partial \tau} \vec{f}(\vec{u}) = 0$$
+
+where $\vec{n} and \vec{\tau}$ are the normal and tangent vectors.

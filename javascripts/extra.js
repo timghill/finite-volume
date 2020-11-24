@@ -1,7 +1,5 @@
 window.MathJax = {
   tex2jax: {
-    inlineMath: [ ["$","$"] ],
-    displayMath: [ ["$$","$$"] ]
   },
   TeX: {
     TagSide: "right",

@@ -6,7 +6,7 @@ This documentation describes the implementation of first-order finite volume met
 ## Heat equation
 
 ## Nonlinear heat equation
-Some inline equations, $F =  f$.
+Some inline equations, \(F =  f\).
 
  A display equation ,$$ \iint_D fdA $$.
 This equation is great.

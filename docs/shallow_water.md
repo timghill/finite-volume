@@ -1,4 +1,10 @@
 # Shallow water equations
+Our finite volume methods were originally developed for the shallow water equations. In a few senses this was an odd choice:
+
+ * Our eventual model has a scalar state variable.
+ * Our model is diffusive, so we do not need to add numerical diffusion.
+
+Nevertheless, they are a good test for our methods and provide a good case study.
 
 ## Two-dimensional shallow water equations
 The shallow water solver solves the two-dimensional system of equations
@@ -24,4 +30,12 @@ where $\vec{n} and \vec{\tau}$ are the normal and tangent vectors.
 ## Finite volume methods
 As usual, we integrate over a control volume \\(\Omega\\). However, we note that only the normal component of flux will act to exchange mass across an edge. We also note that we will replace the flux \\(\vec{f}\\) with the *numerical* flux \\(\vec{f}^\*(\vec{u}_1, \vec{u}_2)\\), which depends on the state vector on both sides of the boundary. Therefore, we end up with
 
-$$\frac{\partial \vec{u}_i}{\partial t} + \frac{1}{|\Omega|} \sum_j \vec{f}^\*(\vec{u}_i, \vec{u}_j)l_j = 0$$
+$$\frac{\partial \vec{u}_i}{\partial t} + \frac{1}{|\Omega_i|} \sum_j \vec{f}^\*(\vec{u}_i, \vec{u}_j)l_j = 0$$
+
+where \\(\vec{u}_i\\) is the *average* of \\(\vec{u}\\) on element \\(\Omega_i\\), \\(|\Omega_i|\\) is the area of the element, and \\(l_j\\) is the length of edge \\(\Gamma_j\\).
+
+### Numerical flux function
+We use a simple first-order numerical flux function, where we take the average of values on neighbouring elements. We add the minimum diffusion required for stability. This turns out to be
+
+$$\vec{f}^\*(\vec{u}_1, \vec{u}_2) = \frac{1}{2}[\vec{f}(\vec{u}_1 + \vec{f}(\vec{u}_2)] - \frac{\alpha}{2}(\vec{u}_2 - \vec{u}_1)$$
+where \\(alpha = \frac{|m_n|}{h} + \sqrt{h}\\) (which can be calculated from the eigenvalues of the flux Jacobian).

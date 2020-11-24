@@ -1,7 +1,7 @@
 site_name: 'Finite volume methods'
 theme:
     name: readthedocs
-
+#
 # Required to load the MathJax javascript for the mdx_math.py
 #extra_javascript:
 #        - 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML'

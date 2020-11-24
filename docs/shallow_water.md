@@ -6,7 +6,4 @@ x &= \nabla^2 \psi \\\
 y &= - \nabla^2 z
 \end{align}
 
-\begin{align}
-\frac{\partial h}{\partial t} + \frac{\partial }{\partial x}(hu) \\
-\frac{\partiial}{\partial t}{(hu) + \frac{\partial}{\partial x} (hu^2 + \frac{1}{2}gh^2)
-\end{align}
+$$\frac{\partial}{\partial t} \begin{bmatrix} h \\\ hu \\\ hv \end{bmatrix} $$

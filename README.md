@@ -6,3 +6,4 @@ This documentation describes the implementation of first-order finite volume met
 ## Heat equation
 
 ## Nonlinear heat equation
+Some inline equations, \\(\vec{F} = \nabla f)\\. A display equation , \\[ \iint_D fdA\\].

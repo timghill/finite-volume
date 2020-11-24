@@ -4,12 +4,6 @@ mkdocs:
         configuration: mkdocs.yml
         fail_on_warning: true
 
-python:
-   version: 2 # for unicode
-   install:
-           - method: setuptools
-             path: .
-
 ~
 ~
 ~

@@ -37,11 +37,11 @@ where \\(\vec{u}_i\\) is the *average* of \\(\vec{u}\\) on element \\(\Omega_i\\
 ### Numerical flux function
 We use a simple first-order numerical flux function, where we take the average of values on neighbouring elements. We add the minimum diffusion required for stability. This turns out to be
 
-$$\vec{f}^\*(\vec{u}_1, \vec{u}_2) = \frac{1}{2}[\vec{f}(\vec{u}_1 + \vec{f}(\vec{u}_2)] - \frac{\alpha}{2}(\vec{u}_2 - \vec{u}_1)$$
-where \\(alpha = \frac{|m_n|}{h} + \sqrt{h}\\) (which can be calculated from the eigenvalues of the flux Jacobian).
+$$\vec{f}^\*(\vec{u}_1, \vec{u}_2) = \frac{1}{2}[\vec{f}(\vec{u}_1) + \vec{f}(\vec{u}_2)] - \frac{\alpha}{2}(\vec{u}_2 - \vec{u}_1)$$
+where \\(\alpha = \frac{|m_n|}{h} + \sqrt{h}\\) (which can be calculated from the eigenvalues of the flux Jacobian).
 
 ## Boundary conditions
-We apply ideal wall boundary conditions. That is, we implement ghost cells where we reverse the momentum components:
+We apply ideal wall boundary conditions. That is, we implement ghost cells where we reverse the momentum components
 
 $$ \vec{u}_j = \begin{bmatrix} h_i \\\ -m_{n, i} \\\ -m_{\tau, i} \end{bmatrix}$$
 

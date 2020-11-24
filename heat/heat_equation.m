@@ -1,7 +1,6 @@
 % heat_equation.m solves the two-dimensional linear heat equation on an
-% unstructured triangular mesh using finite volume methods. The solver uses
-% first-order FV discretization in space with built-in matlab
-% time-stepping.
+% unstructured triangular mesh using finite volume methods with built-in
+% matlab time-stepping.
 
 dmesh=load('../meshes/circ_mesh.mat');
 
@@ -24,23 +23,43 @@ params.gamma=1e-1;
 % Note that 'neumann' boundary conditions conserve thermal energy, while
 % the other BCs allow heat to flow out of the domain through the boundary
 
-params.bc='neumann';
+params.bc='dirichlet';
 params.v_dirichlet=0;   % Must specify value for Dirichlet condition
 
+% Switches
+% The solver supports different methods to calculate gradients. The options
+% are:
+% (1) 'gg' to use simple Green-Gauss/Divergence theorem method. Boundary values
+%      are computed as the average of neighbouring element values
+% (2) 'gg-hybrid' to use Green-Gauss method with a least-squares approach
+%     calculate boundary values.
+% (3) 'lsq' to use weighted least-squares approach to calculate the
+%      gradient value on each element.
+gradient_solvers = {'gg', 'gg-hybrid', 'lsq'};
+params.gradient = gradient_solvers{1};
+
 %% Initial conditions
-u=zeros(size(dmesh.tri.elements(:,1)));
+u0=zeros(size(dmesh.tri.elements(:,1)));
 trix=dmesh.tri.elements(:,1);
 triy=dmesh.tri.elements(:,2);
 trinorm=sqrt(trix.^2+triy.^2);
-% u(trix>-0.5 & trix<0.5 & triy>-0.5 & triy<0.5)=2;
-u(trinorm<0.5)=1;
+u0(trinorm<0.5)=1;
 
-M0=sum(u.*dmesh.tri.area);
+M0=sum(u0.*dmesh.tri.area);
+
+params.derivs = true;
+dx = rhs_heat_unstructured(t, u0, dmesh, params);
+params.derivs = false;
+
+figure
+u_node = interp_el_node(dmesh, dx.vy);
+trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),u_node)
 
 %% Solver
-odefun=@(t,y) rhs_heat_unstructured(t,y,dmesh,params);
+odefun=@(t,y) rhs_heat_unstructured(y,dmesh,params);
+opts = odeset('Stats', 'on');
 tic;
-[tt,yout]=ode45(odefun,tspan,u);
+[tt,yout]=ode45(odefun,tspan,u0,opts);
 toc;
 
 %% Post-processing

@@ -1,4 +1,4 @@
-function vprime=rhs_heat_unstructured(t,v,dmesh,params)
+function vprime=rhs_heat_unstructured(v,dmesh,params)
 % function vprime=rhs_heat_unstructured computes the spatial discretization
 % of the heat equation using first-order finite volume methods on an
 % unstructured triangular mesh. The solver supports three types of boundary
@@ -13,50 +13,86 @@ function vprime=rhs_heat_unstructured(t,v,dmesh,params)
 % [tout,yout]=odeXXX(odefun,tspan,v0)
 
 vprime=zeros(size(v));  % Time derivative of state variable v
-vx=zeros(size(v));      % x-component of gradient of v
-vy=zeros(size(v));      % y-component of gradient of v
+vx=zeros(size(v));      % x-component of gradient of v, defined on elements
+vy=zeros(size(v));      % y-component of gradient of v, defined on elements
 
 % First compute the gradient of v by integrating over triangle edges (e.g.
 % by applying divergence theorem)
 for ii=1:dmesh.tri.n_elements
-    v_gradx=0;
-    v_grady=0;
-    for q=1:3
-        nvec=[dmesh.tri.nx(ii,q),dmesh.tri.ny(ii,q)];
-        r=dmesh.tri.ds(ii,q)/dmesh.tri.area(ii);
-        
-        v1=v(ii);
-        adj_i=dmesh.tri.connect_el_el(ii,q);
-        
-        if adj_i==-1    % Apply boundary conditions
-            if strcmp(params.bc,'dirichlet')
-                v2=params.v_dirichlet;
-            elseif strcmp(params.bc,'neumann')
-                v2=v1;
-            elseif strcmp(params.bc,'flux')
-                v2=v1;
+    for kk=1:3
+        nvec=[dmesh.tri.nx(ii,kk),dmesh.tri.ny(ii,kk)];
+        r=dmesh.tri.ds(ii,kk)/dmesh.tri.area(ii);
+        iEdge=dmesh.tri.connect_el_edge(ii,kk);
+
+        if strcmp(params.gradient, 'gg-hybrid')
+            neigh_els=dmesh.tri.edge_stencil{iEdge};
+
+            edgex=dmesh.tri.edge_midpoints(iEdge,1);
+            edgey=dmesh.tri.edge_midpoints(iEdge,2);
+
+            dx=dmesh.tri.elements(neigh_els,1)-edgex;
+            dy=dmesh.tri.elements(neigh_els,2)-edgey;
+
+            A = [ones(size(dx)), dx, dy];
+            b = v(neigh_els);
+            W=diag(1./sqrt(dx.^2 + dy.^2));
+            W=W/sum(W(:));
+            x_lsq = (W*A)\(W*b);
+            v_bndry = x_lsq(1);
+            vx(ii) = vx(ii) + r*v_bndry*nvec(1);
+            vy(ii) = vy(ii) + r*v_bndry*nvec(2);
+
+        elseif strcmp(params.gradient, 'gg')
+            v1 = v(ii);
+            adj_i = dmesh.tri.connect_el_el(ii,kk);
+
+            if adj_i>0
+                v2 = v(adj_i);
+
+            else        % Apply boundary conditions
+                if strcmp(params.bc,'dirichlet')
+                    v2=params.v_dirichlet;
+                elseif strcmp(params.bc,'neumann')
+                    v2=v1;
+                elseif strcmp(params.bc,'flux')
+                    v2=v1;
+                end
             end
-            
+
             v_bndry=0.5*(v1+v2);
-            v_gradx=v_gradx+v_bndry*nvec(1)*r;
-            v_grady=v_grady+v_bndry*nvec(2)*r;
-        else
-            v2=v(adj_i);
-            v_bndry=0.5*(v1+v2);
-            v_gradx=v_gradx+v_bndry*nvec(1)*r;
-            v_grady=v_grady+v_bndry*nvec(2)*r;
+            vx(ii) = vx(ii) + r*v_bndry*nvec(1);
+            vy(ii) = vy(ii) + r*v_bndry*nvec(2);
         end
-        
+           
     end
-    vx(ii)=v_gradx;
-    vy(ii)=v_grady;
+    
+    if strcmp(params.gradient, 'lsq')
+        neigh_els = dmesh.tri.node_stencil_extended{ii};
+
+        elx = dmesh.tri.elements(ii, 1);
+        ely = dmesh.tri.elements(ii, 2);
+
+        neighx = dmesh.tri.elements(neigh_els, 1);
+        neighy = dmesh.tri.elements(neigh_els, 2);
+
+        dx = neighx - elx;
+        dy = neighy - ely;
+
+        A = [dx, dy];
+        b = v(neigh_els) - v(ii);
+        W = diag(1./sqrt(dx.^2 + dy.^2));
+        W = W/sum(W(:));
+        x_lsq = (W*A)\(W*b);
+
+        vx(ii) = x_lsq(1);
+        vy(ii) = x_lsq(2);
+    end
 end
 
-% Now that we have gradient, compute the numerical flux across the
+% Now that we have the gradient, compute the numerical flux across the
 % boundaries
 for ii=1:dmesh.tri.n_elements
     bndry_el=false;
-    
     f=0;
     for q=1:3
         nvec=[dmesh.tri.nx(ii,q),dmesh.tri.ny(ii,q)];
@@ -83,20 +119,26 @@ for ii=1:dmesh.tri.n_elements
             vy2=vy(adj_i);
         end
         
-        f_x1=params.gamma*vx1;
-        f_y1=params.gamma*vy1;
+        f_x1=params.gamma*(abs(vx1))*sign(vx1);
+        f_y1=params.gamma*(abs(vy1))*sign(vy1);
         
-        f_x2=params.gamma*vx2;
-        f_y2=params.gamma*vy2;
+        f_x2=params.gamma*(abs(vx2))*sign(vx2);
+        f_y2=params.gamma*(abs(vy2))*sign(vy2);
         
         fx=0.5*(f_x1 + f_x2);
         fy=0.5*(f_y1 + f_y2);
         
-        f=f+(fx*nvec(1) + fy*nvec(2))*r;
+        f = f + (fx*nvec(1) + fy*nvec(2))*r;
         
         if strcmp(params.bc,'dirichlet') && bndry_el
-            f=0;
+            f = 0;
         end
     end
-    vprime(ii)=f;
+    vprime(ii) = f;
+end
+
+if params.derivs
+    vprime = struct;
+    vprime.vx = vx;
+    vprime.vy = vy;
 end

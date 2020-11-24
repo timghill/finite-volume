@@ -44,3 +44,10 @@ The last step is to assign weights to each of these equations. For each element 
 $$ W A \vec{x} = W \vec{b}$$
 
 for \\(\vec{x}\\) in the least-squares sense.
+
+## Nonlinear heat equation
+We can also consider a more general flux of the form
+
+$$ \vec{q} = -\gamma u^\alpha \left| \nabla u \right|^{\beta - 1} \nabla u.$$
+
+This allows us to simulate the heat equation (\\(\alpha = 0, \beta = 1)\\), a nonlinear heat equation \\((\alpha = \beta = 1\\), or a turbulent flow parameterization \\(\alpha = 3/2, \beta = 1/2\\).

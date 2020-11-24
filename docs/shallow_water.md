@@ -1,4 +1,6 @@
 # Shallow water equations
+
+## Two-dimensional shallow water equations
 The shallow water solver solves the two-dimensional system of equations
 
 $$\frac{\partial}{\partial t} \begin{bmatrix} h \\\ hu \\\ hv \end{bmatrix} + \frac{\partial}{\partial x} \begin{bmatrix} hu \\\ hu^2 + \frac{1}{2}gh^2 \\\ huv \end{bmatrix} + \frac{\partial}{\partial y} \begin{bmatrix} hv \\\ huv \\\ hv^2 + \frac{1}{2}gh^2 \end{bmatrix} = 0$$
@@ -18,3 +20,8 @@ Note that the first component says that convergence of the normal component of m
 $$\frac{\partial \vec{u}}{\partial t} + \frac{\partial}{\partial n} \vec{f}(\vec{u}) + \frac{\partial}{\partial \tau} \vec{f}(\vec{u}) = 0$$
 
 where $\vec{n} and \vec{\tau}$ are the normal and tangent vectors.
+
+## Finite volume methods
+As usual, we integrate over a control volume \\(\Omega\\). However, we note that only the normal component of flux will act to exchange mass across an edge. We also note that we will replace the flux \\(\vec{f}\\) with the *numerical* flux \\(\vec{f}^\*(\vec{u}_1, \vec{u}_2)\\), which depends on the state vector on both sides of the boundary. Therefore, we end up with
+
+$$\frac{\partial \vec{u}_i}{\partial t} + \frac{1}{|\Omega|} \sum_j \vec{f}^\*(\vec{u}_i, \vec{u}_j)l_j = 0$$

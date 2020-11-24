@@ -15,11 +15,9 @@ params.gamma=1e-1;      % Thermal conductivity constant
 
 % alpha and beta control the flux parameterization. The flux is of the form
 %       gamma * v^alpha * (grad.v)^beta.
-% Therefore, alpha = 0 and beta = 1 corresponds to the linear heat
-% equation, while alpha >0 and beta = 0.5 corresponds to a turbulent flow
-% parameterization.
-params.alpha = 3/2;
-params.beta = 1/2;
+% Ther
+params.alpha = 1;       % Nonlinearity exponent
+params.beta = 0.5;      % Exponent of gradient
 
 % The solver supports three types of boundary conditions, specified
 % using params.bc:
@@ -30,6 +28,7 @@ params.beta = 1/2;
 %                       d(grad.v)/dn=0 on the boundary.
 % Note that 'neumann' boundary conditions conserve thermal energy, while
 % the other BCs allow heat to flow out of the domain through the boundary
+
 params.bc='dirichlet';
 params.v_dirichlet=0;   % Must specify value for Dirichlet condition
 
@@ -55,8 +54,12 @@ u0(trinorm<0.5)=1;
 M0=sum(u0.*dmesh.tri.area);
 
 params.derivs = true;
-dx = rhs_heat_unstructured(u0, dmesh, params);
+dx = rhs_heat_unstructured(t, u0, dmesh, params);
 params.derivs = false;
+
+figure
+u_node = interp_el_node(dmesh, dx.vy);
+trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),u_node)
 
 %% Solver
 odefun=@(t,y) rhs_heat_unstructured(y,dmesh,params);
@@ -92,7 +95,7 @@ for ii=kk
     if strcmp(params.bc,'dirichlet')
         u_node(dmesh.tri.bmark==1)=0;
     end
-    trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),u_node, 'FaceColor', 'interp')
+    trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),u_node)
     axis([-1,1,-1,1,0,1])
     cmocean('thermal')
     title(sprintf('t = %.3f', t))

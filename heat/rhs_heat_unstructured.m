@@ -100,35 +100,41 @@ for ii=1:dmesh.tri.n_elements
         
         vx1=vx(ii);
         vy1=vy(ii);
+        v1 = v(ii);
         adj_i=dmesh.tri.connect_el_el(ii,q);
         if adj_i==-1    % Apply boundary conditions
             if strcmp(params.bc,'dirichlet')
                 vx2=+vx1;
                 vy2=+vy1;
+                v2 = v1;
             elseif strcmp(params.bc,'neumann')
                 vx2=-vx1;
                 vy2=-vy1;
+                v2 = v1;
             elseif strcmp(params.bc,'flux')
                 vx2=vx1;
                 vy2=vy1;
+                v2 = v1;
             end
                 
             bndry_el=true;
         else
+            v2 = v(adj_i);
             vx2=vx(adj_i);
             vy2=vy(adj_i);
         end
         
-        f_x1=params.gamma*(abs(vx1))*sign(vx1);
-        f_y1=params.gamma*(abs(vy1))*sign(vy1);
         
-        f_x2=params.gamma*(abs(vx2))*sign(vx2);
-        f_y2=params.gamma*(abs(vy2))*sign(vy2);
+        f_x1=-params.gamma*(abs(v1))^params.alpha*(abs(vx1))^params.beta*sign(vx1);
+        f_y1=-params.gamma*(abs(v1))^params.alpha*(abs(vy1))^params.beta*sign(vy1);
+        
+        f_x2=-params.gamma*(abs(v2))^params.alpha*(abs(vx2))^params.beta*sign(vx2);
+        f_y2=-params.gamma*(abs(v2))^params.alpha*(abs(vy2))^params.beta*sign(vy2);
         
         fx=0.5*(f_x1 + f_x2);
         fy=0.5*(f_y1 + f_y2);
         
-        f = f + (fx*nvec(1) + fy*nvec(2))*r;
+        f = f - (fx*nvec(1) + fy*nvec(2))*r;
         
         if strcmp(params.bc,'dirichlet') && bndry_el
             f = 0;

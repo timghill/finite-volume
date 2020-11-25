@@ -23,47 +23,52 @@ for ii=1:dmesh.tri.n_elements
         nvec=[dmesh.tri.nx(ii,kk),dmesh.tri.ny(ii,kk)];
         r=dmesh.tri.ds(ii,kk)/dmesh.tri.area(ii);
         iEdge=dmesh.tri.connect_el_edge(ii,kk);
+        
+        adj_i = dmesh.tri.connect_el_el(ii,kk);
+        if adj_i>0
+            % On interior elements, calculate boundary values according to
+            % the chosen gradient method
+            if strcmp(params.gradient, 'gg-hybrid')
 
-        if strcmp(params.gradient, 'gg-hybrid')
-            neigh_els=dmesh.tri.edge_stencil{iEdge};
+                neigh_els=dmesh.tri.edge_stencil{iEdge};
 
-            edgex=dmesh.tri.edge_midpoints(iEdge,1);
-            edgey=dmesh.tri.edge_midpoints(iEdge,2);
+                edgex=dmesh.tri.edge_midpoints(iEdge,1);
+                edgey=dmesh.tri.edge_midpoints(iEdge,2);
 
-            dx=dmesh.tri.elements(neigh_els,1)-edgex;
-            dy=dmesh.tri.elements(neigh_els,2)-edgey;
+                dx=dmesh.tri.elements(neigh_els,1)-edgex;
+                dy=dmesh.tri.elements(neigh_els,2)-edgey;
 
-            A = [ones(size(dx)), dx, dy];
-            b = v(neigh_els);
-            W=diag(1./sqrt(dx.^2 + dy.^2));
-            W=W/sum(W(:));
-            x_lsq = (W*A)\(W*b);
-            v_bndry = x_lsq(1);
+                A = [ones(size(dx)), dx, dy];
+                b = v(neigh_els);
+                W=diag(1./sqrt(dx.^2 + dy.^2));
+                W=W/sum(W(:));
+                x_lsq = (W*A)\(W*b);
+                v_bndry = x_lsq(1);
+
+            elseif strcmp(params.gradient, 'gg')
+                v1 = v(ii);
+                v2 = v(adj_i);
+                
+                v_bndry=0.5*(v1+v2);
+            end
             vx(ii) = vx(ii) + r*v_bndry*nvec(1);
             vy(ii) = vy(ii) + r*v_bndry*nvec(2);
-
-        elseif strcmp(params.gradient, 'gg')
+        else
+            % On boundary elements we use simple GG method with ghost cells
             v1 = v(ii);
-            adj_i = dmesh.tri.connect_el_el(ii,kk);
-
-            if adj_i>0
-                v2 = v(adj_i);
-
-            else        % Apply boundary conditions
-                if strcmp(params.bc,'dirichlet')
-                    v2=params.v_dirichlet;
-                elseif strcmp(params.bc,'neumann')
-                    v2=v1;
-                elseif strcmp(params.bc,'flux')
-                    v2=v1;
-                end
+            if strcmp(params.bc,'dirichlet')
+                v2=params.v_dirichlet;
+            elseif strcmp(params.bc,'neumann')
+                v2=v1;
+            elseif strcmp(params.bc,'flux')
+                v2=v1;
             end
-
+            
             v_bndry=0.5*(v1+v2);
             vx(ii) = vx(ii) + r*v_bndry*nvec(1);
             vy(ii) = vy(ii) + r*v_bndry*nvec(2);
         end
-           
+
     end
     
     if strcmp(params.gradient, 'lsq')

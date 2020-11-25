@@ -3,12 +3,14 @@
 % matlab time-stepping.
 
 dmesh=load('../meshes/circ_mesh.mat');
+dmesh = supplement_dmesh(dmesh);
 
 %% Setup
 % Time-stepping
 tend=1;
 t=0;
 tspan=linspace(t,tend,51);
+dt = 0.01;
 
 % Parameters
 params.gamma=1e-1;      % Thermal conductivity constant
@@ -18,8 +20,8 @@ params.gamma=1e-1;      % Thermal conductivity constant
 % Therefore, alpha = 0 and beta = 1 corresponds to the linear heat
 % equation, while alpha >0 and beta = 0.5 corresponds to a turbulent flow
 % parameterization.
-params.alpha = 3/2;
-params.beta = 1/2;
+params.alpha = 0;
+params.beta = 1;
 
 % The solver supports three types of boundary conditions, specified
 % using params.bc:
@@ -30,7 +32,6 @@ params.beta = 1/2;
 %                       d(grad.v)/dn=0 on the boundary.
 % Note that 'neumann' boundary conditions conserve thermal energy, while
 % the other BCs allow heat to flow out of the domain through the boundary
-params.bc='dirichlet';
 params.v_dirichlet=0;   % Must specify value for Dirichlet condition
 
 % Switches
@@ -43,7 +44,9 @@ params.v_dirichlet=0;   % Must specify value for Dirichlet condition
 % (3) 'lsq' to use weighted least-squares approach to calculate the
 %      gradient value on each element.
 gradient_solvers = {'gg', 'gg-hybrid', 'lsq'};
-params.gradient = gradient_solvers{1};
+params.gradient = gradient_solvers{2};
+rhsfunc = @rhs_heat_unstructured_optimized;
+params.bc='neumann';
 
 %% Initial conditions
 u0=zeros(size(dmesh.tri.elements(:,1)));
@@ -51,18 +54,23 @@ trix=dmesh.tri.elements(:,1);
 triy=dmesh.tri.elements(:,2);
 trinorm=sqrt(trix.^2+triy.^2);
 u0(trinorm<0.5)=1;
+% u0 = exp(-trinorm.^2/0.25);
 
 M0=sum(u0.*dmesh.tri.area);
 
 params.derivs = true;
-dx = rhs_heat_unstructured(u0, dmesh, params);
+dx = rhsfunc(u0, dmesh, params);
+params.derivs = false;
+figure
+trisurf(dmesh.tri.connect,dmesh.tri.nodes(:,1),dmesh.tri.nodes(:,2),interp_el_node(dmesh, dx.vx))
+
 params.derivs = false;
 
 %% Solver
-odefun=@(t,y) rhs_heat_unstructured(y,dmesh,params);
+odefun=@(t,y) rhsfunc(y,dmesh,params);
 opts = odeset('Stats', 'on');
 tic;
-[tt,yout]=ode45(odefun,tspan,u0,opts);
+[tt,yout]=odeRK(odefun,tspan,dt,u0,opts);
 toc;
 
 %% Post-processing

@@ -123,7 +123,7 @@ $$u_k = u_i + \frac{\partial u_i}{\partial x}\Delta x_i + \frac{\partial u_i}{\p
 
 Assembling these \\(m\\) equations into a matrix system, we have
 
-$$\begin{bmatrix} \Delta x_1 && \Delta y_1 \\\ \Delta x_2 && \Delta y_2 \\\ \vdots & \\\ \Delta x_m & \Delta y_m \end{bmatrix} \begin{bmatrix} u_{x,i} \\\ u_{y,i} \end{bmatrix} = \begin{bmatrix} u_1 - u_i \\\ u_2 - u_i \\\ \vdots u_m - u_i \end{bmatrix}$$
+$$\begin{bmatrix} \Delta x_1 & \Delta y_1 \\\ \Delta x_2 & \Delta y_2 \\\ \vdots & \\\ \Delta x_m & \Delta y_m \end{bmatrix} \begin{bmatrix} u_{x,i} \\\ u_{y,i} \end{bmatrix} = \begin{bmatrix} u_1 - u_i \\\ u_2 - u_i \\\ \vdots u_m - u_i \end{bmatrix}$$
 
 We solve this equation using the same weighted approach as the Green-Gauss least squares method.
 

@@ -116,6 +116,43 @@ for ii=1:dmesh.tri.n_elements
 end
 ```
 
+## Least squares method
+Instead of applying the divergence theorem, we can construct a least squares problem directly for the gradient. Consider an arbitrary element \\(\Omega_i\\), and let \\(\{\Omega_k\}_1^m\\) represent the elements that share a node with this element. Then, for each element we write
+
+$$u_k = u_i + \frac{\partial u_i}{\partial x}\Delta x_i + \frac{\partial u_i}{\partial y}\Delta y_i$$
+
+Assembling these \\(m\\) equations into a matrix system, we have
+
+$$\begin{bmatrix} \Delta x_1 && \Delta y_1 \\\ \Delta x_2 && \Delta y_2 \\\ \vdots & \\\ \Delta x_m & \Delta y_m \end{bmatrix} \begin{bmatrix} u_{x,i} \\\ u_{y,i} \end{bmatrix} = \begin{bmatrix} u_1 - u_i \\\ u_2 - u_i \\\ \vdots u_m - u_i \end{bmatrix}$$
+
+We solve this equation using the same weighted approach as the Green-Gauss least squares method.
+
+The following code calculates the gradient:
+
+```Matlab
+for ii=1:dmesh.tri.n_elements
+    neigh_els = dmesh.tri.node_stencil_extended{ii};
+
+    elx = dmesh.tri.elements(ii, 1);
+    ely = dmesh.tri.elements(ii, 2);
+
+    neighx = dmesh.tri.elements(neigh_els, 1);
+    neighy = dmesh.tri.elements(neigh_els, 2);
+
+    dx = neighx - elx;
+    dy = neighy - ely;
+
+    A = [dx, dy];
+    b = v(neigh_els) - v(ii);
+    W = diag(1./sqrt(dx.^2 + dy.^2));
+    W = W/sum(W(:));
+    x_lsq = (W*A)\(W*b);
+
+    vx(ii) = x_lsq(1);
+    vy(ii) = x_lsq(2);
+end
+```
+
 ## Nonlinear heat equation
 We can also consider a more general flux of the form
 

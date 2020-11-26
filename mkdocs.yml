@@ -2,7 +2,11 @@ site_name: 'Finite volume methods'
 theme:
     name: material
     icon:
-      logo: material/triangle-outline
+      logo: material/vector-square
+    palette:
+      - sheme: default
+        primary: blue grey
+        accent: deep purple
 
 # Required to load the MathJax javascript for the mdx_math.py
 extra_javascript:

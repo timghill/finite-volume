@@ -21,3 +21,5 @@ markdown_extensions:
         - pymdownx.highlight
         - pymdownx.superfences
 
+docs_dir: docs_source/
+site_dir: docs/

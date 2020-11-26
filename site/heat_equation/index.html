@@ -1,0 +1,514 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.1.6">
+    
+    
+      
+        <title>Heat equation - Finite volume methods</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6910b76c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.196e0c26.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+      
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#heat-equation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href=".." title="Finite volume methods" class="md-header-nav__button md-logo" aria-label="Finite volume methods">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2L1 21h22M12 6l7.53 13H4.47"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            Finite volume methods
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Heat equation
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Finite volume methods" class="md-nav__button md-logo" aria-label="Finite volume methods">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2L1 21h22M12 6l7.53 13H4.47"/></svg>
+
+    </a>
+    Finite volume methods
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../shallow_water/" class="md-nav__link">
+      Shallow water equations
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Heat equation
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
+      Heat equation
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#green-gauss-method" class="md-nav__link">
+    Green-Gauss method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#green-gauss-hybrid-method" class="md-nav__link">
+    Green-Gauss hybrid method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#least-squares-method" class="md-nav__link">
+    Least squares method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nonlinear-heat-equation" class="md-nav__link">
+    Nonlinear heat equation
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#green-gauss-method" class="md-nav__link">
+    Green-Gauss method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#green-gauss-hybrid-method" class="md-nav__link">
+    Green-Gauss hybrid method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#least-squares-method" class="md-nav__link">
+    Least squares method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nonlinear-heat-equation" class="md-nav__link">
+    Nonlinear heat equation
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="heat-equation">Heat equation</h1>
+<p>The heat equation is usually written</p>
+<p>$$\frac{\partial u}{\partial t} = \gamma \nabla^2 u,$$</p>
+<p>but it can also be written as a conservation law,
+$$\frac{\partial u}{\partial t} + \nabla \cdot \vec{q} = f$$,
+with
+$$\vec{q} = -\gamma\nabla u$$.</p>
+<p>Therefore, we get the same semi-discrete form,</p>
+<p>$$ \frac{\partial \bar{u}}{\partial t} + \frac{1}{|\Omega|} \sum_{k=1}^N \vec{q}_k \cdot \vec{n}_k l_k = F.$$</p>
+<p>The primary difficulty in solving the heat equation is that the flux depends directly on the gradient of \(u\). The numerical flux function we use is simply the exact flux,</p>
+<p>$$q_k = -\gamma \nabla u\big\rvert_{\Gamma_k}.$$</p>
+<p>The difficulty lies in calculating $\nabla u$. We have a few different approaches of varying complexity.</p>
+<h2 id="green-gauss-method">Green-Gauss method</h2>
+<p>The Green-Gauss method uses the Green-Gauss/divergence theorem to calculate the gradient. We follow the same approach as we did to derive the general finite volume semi-discrete form, and find</p>
+<p>$$\nabla u = \frac{1}{|\Omega|} \sum_{k=1}^N u_k \vec{n}_k$$,
+where the edge value \(\vec{u}_k\) is calculated as the average of the neighbouring elements,
+$$\vec{u}_k = \frac{1}{2}(\vec{u}_1 + \vec{u}_2)$$</p>
+<p>This method is simple to implement, but it has been shown to be <em>inconsistent</em> on unstructured meshes. That is, the gradient calculation converges to an incorrect value as the mesh is refined.</p>
+<p>The code below calculates the gradient using the green-gauss method:</p>
+<div class="highlight"><pre><span></span><code><span class="n">vx</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>      <span class="c">% x-component of gradient of v, defined on elements</span>
+<span class="n">vy</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>      <span class="c">% y-component of gradient of v, defined on elements</span>
+
+<span class="c">% First compute the gradient of v by integrating over triangle edges (e.g.</span>
+<span class="c">% by applying divergence theorem)</span>
+<span class="k">for</span> <span class="n">ii</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">n_elements</span>
+    <span class="n">for</span> <span class="s">kk=1:3</span>
+        <span class="n">nvec</span><span class="p">=[</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">nx</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">),</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">ny</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">)];</span>
+        <span class="n">r</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">ds</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">)</span><span class="o">/</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">area</span><span class="p">(</span><span class="n">ii</span><span class="p">);</span>
+        <span class="n">iEdge</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">connect_el_edge</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">);</span>
+
+        <span class="n">v1</span> <span class="p">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ii</span><span class="p">);</span>
+        <span class="n">adj_i</span> <span class="p">=</span> <span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">connect_el_el</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">);</span>
+
+        <span class="n">if</span> <span class="s">adj_i&gt;0</span>
+            <span class="n">v2</span> <span class="p">=</span> <span class="n">v</span><span class="p">(</span><span class="n">adj_i</span><span class="p">);</span>
+
+        <span class="n">else</span>        <span class="s">%</span> <span class="s">Apply</span> <span class="s">boundary</span> <span class="s">conditions</span>
+            <span class="n">if</span> <span class="s">strcmp(params.bc,&#39;dirichlet&#39;)</span>
+                <span class="n">v2</span><span class="p">=</span><span class="n">params</span><span class="p">.</span><span class="n">v_dirichlet</span><span class="p">;</span>
+            <span class="n">elseif</span> <span class="s">strcmp(params.bc,&#39;neumann&#39;)</span>
+                <span class="n">v2</span><span class="p">=</span><span class="n">v1</span><span class="p">;</span>
+            <span class="n">elseif</span> <span class="s">strcmp(params.bc,&#39;flux&#39;)</span>
+                <span class="n">v2</span><span class="p">=</span><span class="n">v1</span><span class="p">;</span>
+            <span class="n">end</span>
+        <span class="s">end</span>
+
+        <span class="n">v_bndry</span><span class="p">=</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">v1</span><span class="o">+</span><span class="n">v2</span><span class="p">);</span>
+        <span class="n">vx</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="p">=</span> <span class="n">vx</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="o">+</span> <span class="n">r</span><span class="o">*</span><span class="n">v_bndry</span><span class="o">*</span><span class="n">nvec</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">vy</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="p">=</span> <span class="n">vy</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="o">+</span> <span class="n">r</span><span class="o">*</span><span class="n">v_bndry</span><span class="o">*</span><span class="n">nvec</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">end</span>
+<span class="s">end</span>
+</code></pre></div>
+<h2 id="green-gauss-hybrid-method">Green-Gauss hybrid method</h2>
+<p>We can fix the issues with the Green-Gauss method by being smarter in calculating the edge value \(u_k\). Let \({\Gamma_i}\}_{i=1}^m\) be the set of elements that share a node with edge \(\Gamma_k\). Then, for an arbitrary element, we can expand</p>
+<p>$$u_i = u_k + \frac{\partial u_k}{\partial x}\Delta x + \frac{\partial u_k}{\partial y}\Delta y.$$</p>
+<p>Combining the \(m\) equations, we find a matrix system</p>
+<p>$$\begin{bmatrix} 1 &amp;&amp; \Delta x_1 &amp;&amp; \Delta y_1 \\ 1 &amp;&amp; \Delta x_2 &amp;&amp; \Delta y_2 \\ &amp;&amp; \vdots &amp;&amp; \\ 1 &amp;&amp; \Delta x_m &amp;&amp; \Delta y_m \end{bmatrix} \begin{bmatrix} u_k \\ \frac{\partial u_k}{\partial x} \\ \frac{\partial u_k}{\partial y} \end{bmatrix} = \begin{bmatrix} u_1 \\ u_2 \\ \vdots \\ u_m \end{bmatrix}$$</p>
+<p>We write this as
+$$ A\vec{x} = \vec{b}$$.</p>
+<p>The last step is to assign weights to each of these equations. For each element we define a weight \(w_k = (\Delta x_k^2 + \Delta y_k^2)^{-1/2}\), which definethe diagonal weight matrix \(W\), with \((W_kk) = w_k \). Therefore, we solve the system</p>
+<p>$$ W A \vec{x} = W \vec{b}$$</p>
+<p>for \(\vec{x}\) in the least-squares sense.</p>
+<p>The code below calculates the gradient using the green-gauss hybrid method:
+<div class="highlight"><pre><span></span><code><span class="n">vx</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>      <span class="c">% x-component of gradient of v, defined on elements</span>
+<span class="n">vy</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>      <span class="c">% y-component of gradient of v, defined on elements</span>
+
+<span class="c">% First compute the gradient of v by integrating over triangle edges (e.g.</span>
+<span class="c">% by applying divergence theorem)</span>
+<span class="k">for</span> <span class="n">ii</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">n_elements</span>
+    <span class="n">for</span> <span class="s">kk=1:3</span>
+        <span class="n">nvec</span><span class="p">=[</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">nx</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">),</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">ny</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">)];</span>
+        <span class="n">r</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">ds</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">)</span><span class="o">/</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">area</span><span class="p">(</span><span class="n">ii</span><span class="p">);</span>
+        <span class="n">iEdge</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">connect_el_edge</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">kk</span><span class="p">);</span>
+
+        <span class="n">neigh_els</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">edge_stencil</span><span class="p">{</span><span class="n">iEdge</span><span class="p">};</span>
+
+        <span class="n">edgex</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">edge_midpoints</span><span class="p">(</span><span class="n">iEdge</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">edgey</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">edge_midpoints</span><span class="p">(</span><span class="n">iEdge</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+
+        <span class="n">dx</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">elements</span><span class="p">(</span><span class="n">neigh_els</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">edgex</span><span class="p">;</span>
+        <span class="n">dy</span><span class="p">=</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">elements</span><span class="p">(</span><span class="n">neigh_els</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">edgey</span><span class="p">;</span>
+
+        <span class="n">A</span> <span class="p">=</span> <span class="p">[</span><span class="nb">ones</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">dx</span><span class="p">)),</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">];</span>
+        <span class="n">b</span> <span class="p">=</span> <span class="n">v</span><span class="p">(</span><span class="n">neigh_els</span><span class="p">);</span>
+        <span class="n">W</span><span class="p">=</span><span class="nb">diag</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">.^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">.^</span><span class="mi">2</span><span class="p">));</span>
+        <span class="n">W</span><span class="p">=</span><span class="n">W</span><span class="o">/</span><span class="n">sum</span><span class="p">(</span><span class="n">W</span><span class="p">(:));</span>
+        <span class="n">x_lsq</span> <span class="p">=</span> <span class="p">(</span><span class="n">W</span><span class="o">*</span><span class="n">A</span><span class="p">)</span><span class="o">\</span><span class="p">(</span><span class="n">W</span><span class="o">*</span><span class="n">b</span><span class="p">);</span>
+        <span class="n">v_bndry</span> <span class="p">=</span> <span class="n">x_lsq</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">vx</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="p">=</span> <span class="n">vx</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="o">+</span> <span class="n">r</span><span class="o">*</span><span class="n">v_bndry</span><span class="o">*</span><span class="n">nvec</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">vy</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="p">=</span> <span class="n">vy</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="o">+</span> <span class="n">r</span><span class="o">*</span><span class="n">v_bndry</span><span class="o">*</span><span class="n">nvec</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">end</span>
+<span class="s">end</span>
+</code></pre></div></p>
+<h2 id="least-squares-method">Least squares method</h2>
+<p>Instead of applying the divergence theorem, we can construct a least squares problem directly for the gradient. Consider an arbitrary element \(\Omega_i\), and let \({\Omega_k}_1^m\) represent the elements that share a node with this element. Then, for each element we write</p>
+<p>$$u_k = u_i + \frac{\partial u_i}{\partial x}\Delta x_i + \frac{\partial u_i}{\partial y}\Delta y_i$$</p>
+<p>Assembling these \(m\) equations into a matrix system, we have</p>
+<p>$$\begin{bmatrix} \Delta x_1 &amp; \Delta y_1 \\ \Delta x_2 &amp; \Delta y_2 \\ \vdots &amp; \\ \Delta x_m &amp; \Delta y_m \end{bmatrix} \begin{bmatrix} u_{x,i} \\ u_{y,i} \end{bmatrix} = \begin{bmatrix} u_1 - u_i \\ u_2 - u_i \\ \vdots u_m - u_i \end{bmatrix}$$</p>
+<p>We solve this equation using the same weighted approach as the Green-Gauss least squares method.</p>
+<p>The following code calculates the gradient:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">ii</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">n_elements</span>
+    <span class="n">neigh_els</span> <span class="p">=</span> <span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">node_stencil_extended</span><span class="p">{</span><span class="n">ii</span><span class="p">};</span>
+
+    <span class="n">elx</span> <span class="p">=</span> <span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">elements</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">ely</span> <span class="p">=</span> <span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">elements</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="n">neighx</span> <span class="p">=</span> <span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">elements</span><span class="p">(</span><span class="n">neigh_els</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">neighy</span> <span class="p">=</span> <span class="n">dmesh</span><span class="p">.</span><span class="n">tri</span><span class="p">.</span><span class="n">elements</span><span class="p">(</span><span class="n">neigh_els</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="n">dx</span> <span class="p">=</span> <span class="n">neighx</span> <span class="o">-</span> <span class="n">elx</span><span class="p">;</span>
+    <span class="n">dy</span> <span class="p">=</span> <span class="n">neighy</span> <span class="o">-</span> <span class="n">ely</span><span class="p">;</span>
+
+    <span class="n">A</span> <span class="p">=</span> <span class="p">[</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">];</span>
+    <span class="n">b</span> <span class="p">=</span> <span class="n">v</span><span class="p">(</span><span class="n">neigh_els</span><span class="p">)</span> <span class="o">-</span> <span class="n">v</span><span class="p">(</span><span class="n">ii</span><span class="p">);</span>
+    <span class="n">W</span> <span class="p">=</span> <span class="nb">diag</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">.^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">.^</span><span class="mi">2</span><span class="p">));</span>
+    <span class="n">W</span> <span class="p">=</span> <span class="n">W</span><span class="o">/</span><span class="n">sum</span><span class="p">(</span><span class="n">W</span><span class="p">(:));</span>
+    <span class="n">x_lsq</span> <span class="p">=</span> <span class="p">(</span><span class="n">W</span><span class="o">*</span><span class="n">A</span><span class="p">)</span><span class="o">\</span><span class="p">(</span><span class="n">W</span><span class="o">*</span><span class="n">b</span><span class="p">);</span>
+
+    <span class="n">vx</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="p">=</span> <span class="n">x_lsq</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">vy</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="p">=</span> <span class="n">x_lsq</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">end</span>
+</code></pre></div>
+<h2 id="nonlinear-heat-equation">Nonlinear heat equation</h2>
+<p>We can also consider a more general flux of the form</p>
+<p>$$ \vec{q} = -\gamma u^\alpha \left| \nabla u \right|^{\beta - 1} \nabla u.$$</p>
+<p>This allows us to simulate the heat equation (\(\alpha = 0, \beta = 1)\), a nonlinear heat equation \((\alpha = \beta = 1)\), or a turbulent flow parameterization \(\alpha = 3/2, \beta = 1/2\).</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../shallow_water/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Shallow water equations
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/vendor.fd16492e.min.js"></script>
+      <script src="../assets/javascripts/bundle.7836ba4d.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "..",
+          features: [],
+          search: Object.assign({
+            worker: "../assets/javascripts/worker/search.4ac00218.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+      
+        <script src="../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>

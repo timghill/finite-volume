@@ -1,6 +1,8 @@
 site_name: 'Finite volume methods'
 theme:
-    name: readthedocs
+    name: material
+    icon:
+      logo: material/triangle-outline
 
 # Required to load the MathJax javascript for the mdx_math.py
 extra_javascript:
@@ -10,3 +12,8 @@ nav:
         - Home: index.md
         - shallow_water.md
         - heat_equation.md
+          
+markdown_extensions:
+        - pymdownx.highlight
+        - pymdownx.superfences
+

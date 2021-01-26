@@ -41,6 +41,7 @@ if strcmp(params.gradient, 'gg-hybrid') || strcmp(params.gradient, 'gg')
                 W=diag(1./sqrt(dx.^2 + dy.^2));
                 W=W/sum(W(:));
                 x_lsq = (W*A)\(W*b);
+%                 x_lsq = (A'*W*A)\(A'*W*b);
                 v_bndry = x_lsq(1);
 
                 if neigh_els(1)>0

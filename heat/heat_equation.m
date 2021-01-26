@@ -46,15 +46,15 @@ params.v_dirichlet=0;   % Must specify value for Dirichlet condition
 gradient_solvers = {'gg', 'gg-hybrid', 'lsq'};
 params.gradient = gradient_solvers{2};
 rhsfunc = @rhs_heat_unstructured_optimized;
-params.bc='neumann';
+params.bc='dirichlet';
 
 %% Initial conditions
 u0=zeros(size(dmesh.tri.elements(:,1)));
 trix=dmesh.tri.elements(:,1);
 triy=dmesh.tri.elements(:,2);
 trinorm=sqrt(trix.^2+triy.^2);
-u0(trinorm<0.5)=1;
-% u0 = exp(-trinorm.^2/0.25);
+% u0(trinorm<0.5)=1;
+u0 = exp(-trinorm.^2/0.25);
 
 M0=sum(u0.*dmesh.tri.area);
 
@@ -70,7 +70,8 @@ params.derivs = false;
 odefun=@(t,y) rhsfunc(y,dmesh,params);
 opts = odeset('Stats', 'on');
 tic;
-[tt,yout]=odeRK(odefun,tspan,dt,u0,opts);
+% [tt,yout]=odeRK(odefun,tspan,dt,u0,opts);
+[tt,yout] = ode45(odefun,tspan,u0,opts);
 toc;
 
 %% Post-processing
@@ -92,7 +93,7 @@ for ii=1:length(tspan)
     pause(0.1)
 end
 
-kk=[10,30];
+kk=[20,51];
 for ii=kk
     t=tspan(ii);
     figure
@@ -106,7 +107,7 @@ for ii=kk
     title(sprintf('t = %.3f', t))
     caxis([0,1])
     drawnow
-    print(sprintf('heat_%s_%i',params.bc,ii),'-dpng','-r600')
+    print(sprintf('heat_%i_corrected',ii),'-dpng','-r600')
 end
 
 % Compute total "Mass" in the domain. Depending on the boundary conditions
